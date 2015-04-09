@@ -1,25 +1,32 @@
 #!/usr/bin/env bash
 
-whoami
-echo ~/
+# enable console colors
+sed -i '1iforce_color_prompt=yes' ~/.bashrc
 
-sudo apt-get install -y git
-sudo apt-get install -y curl
+# disable docs during gem install
+echo 'gem: --no-rdoc --no-ri' >> ~/.gemrc
 
-curl -sSL https://get.rvm.io | bash -s stable
-source /home/vagrant/.rvm/scripts/rvm
-rvm use --install 2.1.1
-
-sudo apt-get install -y libqtwebkit-dev
-gem install debugger-ruby_core_source
-
+# set locales
 export LANGUAGE="en_US.UTF-8"
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 
-sudo apt-get install -y libpq-dev
-sudo apt-get install -y postgresql
+# essentials
+sudo apt-get -y update
+sudo apt-get install -y autoconf bison build-essential libssl-dev libyaml-dev libreadline6 libreadline6-dev zlib1g zlib1g-dev libcurl4-openssl-dev curl wget
 
+# SQLite, Git and Node.js
+sudo apt-get install -y libsqlite3-dev git nodejs
+
+# Qt and xvfb-run for Capybara Webkit
+sudo apt-get install -y libqtwebkit-dev xvfb
+
+# ImageMagick and Rmagick
+sudo apt-get install -y imagemagick libmagickwand-dev
+
+# Postgres
+#sudo apt-get install -y postgresql-9.3 postgresql-server-dev-9.3 postgresql-contrib-9.3 libpq-dev postgresql
+sudo apt-get install -y libpq-dev postgresql
 # need to edit /etc/postgresql/9.1/main/pg_hba.conf
 # needs work to handle variable white space
 #
@@ -42,26 +49,33 @@ psql postgres postgres << EOF
     UPDATE pg_database SET datallowconn = FALSE where datname = 'template0';
 EOF
 
-sudo apt-get install -y xvfb
-sudo apt-get install libicu48
+# Memcached
+sudo apt-get install -y memcached
 
+# Redis
+sudo apt-get install -y redis-server
 
-sudo apt-get install -y python-software-properties
-# How to get this command to run unattended?
-sudo add-apt-repository ppa:chris-lea/node.js
-sudo apt-get update
-sudo apt-get install -y  nodejs
+# rvm
+gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+\curl -sSL https://get.rvm.io | bash
+source ~/.rvm/scripts/rvm
+rvm requirements
+rvm install ruby-2.1.5
+rvm use ruby-2.1.5 --default
+ruby -v
 
-curl -L https://npmjs.org/install.sh | sudo sh
+# Phantomjs
+sudo wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86_64.tar.bz2 -P /usr/local/share --quiet
+sudo tar xjf /usr/local/share/phantomjs-1.9.7-linux-x86_64.tar.bz2 -C /usr/local/share
+sudo ln -s /usr/local/share/phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/local/share/phantomjs
+sudo ln -s /usr/local/share/phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/local/bin/phantomjs
+sudo ln -s /usr/local/share/phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/bin/phantomjs
 
-# The following script duplicates some of the above configuration, but
-# adds some important Rails dependencies
-# It is largely incompatible with Ubuntu 12.4 (precise) but the parts that are needed work
-wget https://github.com/AgileVentures/setup-scripts/raw/develop/scripts/rails_setup.sh
-HEADLESS=true WITH_PHANTOMJS=true REQUIRED_RUBY=2.1.1 source rails_setup.sh
+# cleanup
+sudo apt-get clean
 
 cd /WebsiteOne
-
+gem install bundler
 bundle install
 bundle exec rake db:setup
 

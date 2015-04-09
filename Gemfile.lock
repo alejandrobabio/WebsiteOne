@@ -470,7 +470,6 @@ GEM
       nokogiri (~> 1.3)
     youtube_it (2.1.1)
       builder
-      builder
       faraday
       faraday (>= 0.7.3)
       nokogiri
