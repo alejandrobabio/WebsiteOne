@@ -1,6 +1,5 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-# Original script on https://github.com/orendon/vagrant-rails
 
 VAGRANTFILE_API_VERSION = "2"
 
